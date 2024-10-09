@@ -16,6 +16,15 @@ const readDatabase = () => JSON.parse(fs.readFileSync(dbPath));
 const writeDatabase = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
 
 // Rutas
+
+router.get('/api/welcome', async (ctx) => {
+  ctx.body = {
+    message: 'Bienvenido Candidato 01',
+    version: '1.0.0',
+    image: 'https://via.placeholder.com/150'  // Puedes reemplazar con una URL de imagen válida
+  };
+});
+
 router.get('/api/providers', async (ctx) => {
   const data = readDatabase();
   ctx.body = data.providers;

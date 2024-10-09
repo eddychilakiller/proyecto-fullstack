@@ -1,19 +1,20 @@
 version: '3.8'
 services:
-#  frontend:
-#    container_name: frontend
-#    build:
-#      context: ./frontend
-#    ports:
-#      - "3000:3000"
-#    environment:
-#      - NODE_ENV=development
-#    volumes:
-#      - ./frontend:/app
-#    command: npm start
-#    depends_on:
-#      - backend
-#  
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - ./frontend/public:/app/public # Montamos explícitamente la carpeta public
+    command: npm start
+    depends_on:
+      - backend
+  
   backend:
     container_name: backend
     build:
