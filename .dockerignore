@@ -1,0 +1,18 @@
+# Ignorar node_modules (se instalarán dentro del contenedor)
+node_modules
+
+# Ignorar archivos de configuración de Git
+.git
+.gitignore
+
+# Ignorar logs
+logs/
+*.log
+
+# Ignorar archivos de configuración de Docker Compose
+docker-compose.yml
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
