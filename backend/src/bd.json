@@ -1,0 +1,17 @@
+{
+  "providers": [
+    {
+      "id": 1,
+      "name": "Proveedor 1",
+      "reason": "Razón Social 1",
+      "address": "Dirección 1"
+    },
+    {
+      "id": 2,
+      "name": "Proveedor 2",
+      "reason": "Razón Social 2",
+      "address": "Dirección 2"
+    }
+  ]
+}
+
