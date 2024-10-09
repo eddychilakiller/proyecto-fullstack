@@ -2,16 +2,27 @@
   "providers": [
     {
       "id": 1,
-      "name": "Proveedor 1",
-      "reason": "Razón Social 1",
-      "address": "Dirección 1"
+      "nombre": "Proveedor 1",
+      "razonSocial": "Razón Social 1",
+      "direccion": "Dirección 1"
     },
     {
       "id": 2,
-      "name": "Proveedor 2",
-      "reason": "Razón Social 2",
-      "address": "Dirección 2"
+      "nombre": "Proveedor 2",
+      "razonSocial": "Razón Social 2",
+      "direccion": "Dirección 2"
+    },
+    {
+      "id": 3,
+      "nombre": "a",
+      "razonSocial": "b",
+      "direccion": "c"
+    },
+    {
+      "id": 4,
+      "nombre": "v",
+      "razonSocial": "b",
+      "direccion": "c"
     }
   ]
 }
-

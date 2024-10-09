@@ -3,10 +3,20 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const fs = require('fs');
 const path = require('path');
+const cors = require('@koa/cors');  // Importar koa-cors
 
 const app = new Koa();
 const router = new Router();
 const dbPath = path.join(__dirname, 'bd.json');
+
+
+// Usar CORS
+app.use(cors({
+  origin: '*',  // Permitir todas las peticiones
+  allowMethods: ['GET', 'POST', 'DELETE', 'PUT'],  // Métodos permitidos
+  allowHeaders: ['Content-Type', 'Authorization'],  // Headers permitidos
+}));
+
 
 // Middleware
 app.use(bodyParser());
@@ -17,7 +27,7 @@ const writeDatabase = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, nu
 
 // Rutas
 
-router.get('/api/welcome', async (ctx) => {
+router.get('/welcome', async (ctx) => {
   ctx.body = {
     message: 'Bienvenido Candidato 01',
     version: '1.0.0',
@@ -25,15 +35,15 @@ router.get('/api/welcome', async (ctx) => {
   };
 });
 
-router.get('/api/providers', async (ctx) => {
+router.get('/proveedores', async (ctx) => {
   const data = readDatabase();
   ctx.body = data.providers;
 });
 
-router.post('/api/providers', async (ctx) => {
-  const { name, reason, address } = ctx.request.body;
+router.post('/proveedores', async (ctx) => {
+  const { nombre, razonSocial, direccion } = ctx.request.body;
   const data = readDatabase();
-  const exists = data.providers.find(provider => provider.name === name);
+  const exists = data.providers.find(provider => provider.nombre === nombre);
 
   if (exists) {
     ctx.status = 400;
@@ -41,9 +51,9 @@ router.post('/api/providers', async (ctx) => {
   } else {
     const newProvider = {
       id: data.providers.length + 1,
-      name,
-      reason,
-      address
+      nombre,
+      razonSocial,
+      direccion
     };
     data.providers.push(newProvider);
     writeDatabase(data);
@@ -52,7 +62,7 @@ router.post('/api/providers', async (ctx) => {
   }
 });
 
-router.delete('/api/providers/:id', async (ctx) => {
+router.delete('/proveedores/:id', async (ctx) => {
   const { id } = ctx.params;
   let data = readDatabase();
   const initialLength = data.providers.length;
