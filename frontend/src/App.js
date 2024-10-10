@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './index.css'; // Puedes agregar tus estilos personalizados aquí
 
 function App() {
   const [welcomeMessage, setWelcomeMessage] = useState('');
@@ -91,27 +92,43 @@ function App() {
   };
 
   return (
-    <div className="container my-5">
-      <div class="p-5 text-center bg-body-tertiary rounded-3">
-        <h1 className="my-4">{welcomeMessage}</h1>
-        <p>Versión: {version}</p>
+<div className="container my-5">
+      {/* Encabezado con imagen */}
+      <div className="text-center mb-5">
+        <img src="https://via.placeholder.com/150" alt="Candidato" className="rounded-circle mb-3" />
+        <h1 className="display-4">{welcomeMessage}</h1>
+        <p className="lead">Versión: {version}</p>
       </div>
 
-      <h2 className="my-4">Lista de Proveedores</h2>
-      <ul className="list-group mb-4">
+      {/* Listado de proveedores */}
+      <h2 className="text-center mb-4">Lista de Proveedores</h2>
+      <div className="row">
         {proveedores.length > 0 ? (
           proveedores.map((proveedor, index) => (
-            <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-              {proveedor.nombre} - {proveedor.razonSocial} - {proveedor.direccion}
-              <button className="btn btn-danger" onClick={() => eliminarProveedor(proveedor.nombre)}>Eliminar</button>
-            </li>
+            <div className="col-md-6 mb-3" key={index}>
+              <div className="card shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">{proveedor.nombre}</h5>
+                  <p className="card-text">
+                    <strong>Razón Social:</strong> {proveedor.razonSocial} <br />
+                    <strong>Dirección:</strong> {proveedor.direccion}
+                  </p>
+                  <button className="btn btn-danger" onClick={() => eliminarProveedor(proveedor.nombre)}>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
           ))
         ) : (
-          <li className="list-group-item">No hay proveedores disponibles.</li>
+          <div className="col-12">
+            <p className="text-center">No hay proveedores disponibles.</p>
+          </div>
         )}
-      </ul>
+      </div>
 
-      <div className="d-flex justify-content-between">
+      {/* Paginación */}
+      <div className="d-flex justify-content-between align-items-center mt-4">
         <button className="btn btn-primary" onClick={anteriorPagina} disabled={page === 1}>
           Anterior
         </button>
@@ -121,41 +138,46 @@ function App() {
         </button>
       </div>
 
-      <h2 className="my-4">Agregar Proveedor</h2>
-      <form onSubmit={agregarProveedor}>
-        <div className="form-group">
-          <label>Nombre</label>
+      {/* Formulario para agregar proveedores */}
+      <h2 className="text-center my-4">Agregar Proveedor</h2>
+      <form onSubmit={agregarProveedor} className="p-4 shadow-sm rounded bg-light">
+        <div className="form-group mb-3">
+          <label htmlFor="nombre">Nombre</label>
           <input
             type="text"
             className="form-control"
+            id="nombre"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label>Razón Social</label>
+        <div className="form-group mb-3">
+          <label htmlFor="razonSocial">Razón Social</label>
           <input
             type="text"
             className="form-control"
+            id="razonSocial"
             value={razonSocial}
             onChange={(e) => setRazonSocial(e.target.value)}
             required
           />
         </div>
-        <div className="form-group">
-          <label>Dirección</label>
+        <div className="form-group mb-3">
+          <label htmlFor="direccion">Dirección</label>
           <input
             type="text"
             className="form-control"
+            id="direccion"
             value={direccion}
             onChange={(e) => setDireccion(e.target.value)}
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary mt-3">Agregar Proveedor</button>
+        <button type="submit" className="btn btn-success w-100">Agregar Proveedor</button>
       </form>
 
+      {/* Mensajes de éxito o error */}
       {error && <div className="alert alert-danger mt-3">{error}</div>}
       {success && <div className="alert alert-success mt-3">{success}</div>}
     </div>
