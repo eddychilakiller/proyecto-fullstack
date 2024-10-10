@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('@koa/cors');  // Importar koa-cors
 const db = require('./bd');  // Importamos el Singleton de la base de datos
+const ProveedorFactory = require('./ProveedorFactory');  // Importar la fábrica
 
 const app = new Koa();
 const router = new Router();
@@ -54,16 +55,17 @@ router.get('/proveedores', (ctx) => {
 
 router.post('/proveedores', (ctx) => {
   const data = db.getProveedores();  // Usamos el Singleton para leer los proveedores
-  const nuevoProveedor = ctx.request.body;
+  const { nombre, razonSocial, direccion } = ctx.request.body;
+  const existe = data.proveedores.some(p => p.nombre === nombre);
 
-  const existe = data.proveedores.some(p => p.nombre === nuevoProveedor.nombre);
 
   if (existe) {
     ctx.status = 400;
     ctx.body = { error: 'El proveedor ya existe' };
   } else {
+    const nuevoProveedor = ProveedorFactory.createProveedor(nombre, razonSocial, direccion);  // Usar la fábrica
     data.proveedores.push(nuevoProveedor);
-    db.saveProveedores(data.proveedores);  // Usamos el Singleton para guardar los proveedores
+    db.saveProveedores(data.proveedores);
     ctx.body = { message: 'Proveedor agregado', proveedor: nuevoProveedor };
   }
 });
