@@ -1,16 +1,22 @@
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
-const fs = require('fs');
-const path = require('path');
 const cors = require('@koa/cors');  // Importar koa-cors
 const db = require('./bd');  // Importamos el Singleton de la base de datos
 const ProveedorFactory = require('./ProveedorFactory');  // Importar la fábrica
+const serve = require('koa-static');
+const path = require('path');
+const swaggerUi = require('swagger-ui-koa');
+const swaggerDocs = require('./swaggerConfig');
+
 
 const app = new Koa();
 const router = new Router();
-const dbPath = path.join(__dirname, 'bd.json');
 
+// Ruta para la documentación de Swagger
+app.use(serve(path.join(__dirname, 'public')));  // Servir archivos estáticos desde la carpeta 'public'
+app.use(swaggerUi.serve);
+router.get('/docs', swaggerUi.setup(swaggerDocs));
 
 // Usar CORS
 app.use(cors({
@@ -23,22 +29,85 @@ app.use(cors({
 // Middleware
 app.use(bodyParser());
 
-// Helper to read and write from the "database"
-const readDatabase = () => JSON.parse(fs.readFileSync(dbPath));
-const writeDatabase = (data) => fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-
-// Rutas
-
+/**
+ * @swagger
+ * /welcome:
+ *   get:
+ *     summary: Devuelve un mensaje de bienvenida
+ *     description: Retorna un mensaje de bienvenida con la versión de la aplicación.
+ *     responses:
+ *       200:
+ *         description: Mensaje de bienvenida con versión
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Bienvenido Candidato 01
+ *                 version:
+ *                   type: string
+ *                   example: 1.0.0
+ */
 router.get('/welcome', async (ctx) => {
   ctx.body = {
     message: 'Bienvenido Candidato 01',
     version: '1.0.0',
-    image: 'https://via.placeholder.com/150'  // Puedes reemplazar con una URL de imagen válida
+    image: 'https://via.placeholder.com/150'  
   };
 });
 
-// Ruta para listar proveedores con paginación
-router.get('/proveedores', (ctx) => {
+/**
+ * @swagger
+ * /proveedores:
+ *   get:
+ *     summary: Obtiene la lista de proveedores
+ *     description: Devuelve una lista paginada de proveedores
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Número de página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Número de proveedores por página
+ *     responses:
+ *       200:
+ *         description: Lista de proveedores paginada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 proveedores:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       nombre:
+ *                         type: string
+ *                         example: Proveedor 1
+ *                       razonSocial:
+ *                         type: string
+ *                         example: Empresa 1
+ *                       direccion:
+ *                         type: string
+ *                         example: Dirección 1
+ *                 total:
+ *                   type: integer
+ *                   example: 10
+ *                 page:
+ *                   type: integer
+ *                   example: 1
+ *                 limit:
+ *                   type: integer
+ *                   example: 5
+ */
+  router.get('/proveedores', (ctx) => {
   const { page = 1, limit = 5 } = ctx.query;
   const data = db.getProveedores();  // Usamos el Singleton para obtener los proveedores
   const startIndex = (page - 1) * limit;
@@ -53,6 +122,48 @@ router.get('/proveedores', (ctx) => {
   };
 });
 
+/**
+ * @swagger
+ * /proveedores:
+ *   post:
+ *     summary: Agrega un nuevo proveedor
+ *     description: Crea un nuevo proveedor y lo agrega a la base de datos
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               razonSocial:
+ *                 type: string
+ *               direccion:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Proveedor agregado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Proveedor agregado
+ *                 proveedor:
+ *                   type: object
+ *                   properties:
+ *                     nombre:
+ *                       type: string
+ *                     razonSocial:
+ *                       type: string
+ *                     direccion:
+ *                       type: string
+ *       400:
+ *         description: El proveedor ya existe
+ */
 router.post('/proveedores', (ctx) => {
   const data = db.getProveedores();  // Usamos el Singleton para leer los proveedores
   const { nombre, razonSocial, direccion } = ctx.request.body;
@@ -70,6 +181,32 @@ router.post('/proveedores', (ctx) => {
   }
 });
 
+/**
+ * @swagger
+ * /proveedores/{nombre}:
+ *   delete:
+ *     summary: Elimina un proveedor por nombre
+ *     description: Elimina un proveedor existente
+ *     parameters:
+ *       - in: path
+ *         name: nombre
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Proveedor eliminado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Proveedor eliminado
+ *       404:
+ *         description: Proveedor no encontrado
+ */
 router.delete('/proveedores/:nombre', (ctx) => {
   const data = db.getProveedores();  // Usamos el Singleton para leer los proveedores
   const nombre = ctx.params.nombre;

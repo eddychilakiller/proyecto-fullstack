@@ -13,31 +13,9 @@
       "direccion": "Dirección 2"
     },
     {
-      "id": 3,
       "nombre": "a",
       "razonSocial": "b",
       "direccion": "c"
-    },
-    {
-      "id": 4,
-      "nombre": "v",
-      "razonSocial": "b",
-      "direccion": "c"
-    },
-    {
-      "nombre": "dsds",
-      "razonSocial": "sdsds",
-      "direccion": "sdsds"
-    },
-    {
-      "nombre": "aff",
-      "razonSocial": "b",
-      "direccion": "c"
-    },
-    {
-      "nombre": "wqw",
-      "razonSocial": "wqwq",
-      "direccion": "wqw"
     }
   ]
 }

@@ -91,9 +91,11 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <h1 className="my-4">{welcomeMessage}</h1>
-      <p>Versión: {version}</p>
+    <div className="container my-5">
+      <div class="p-5 text-center bg-body-tertiary rounded-3">
+        <h1 className="my-4">{welcomeMessage}</h1>
+        <p>Versión: {version}</p>
+      </div>
 
       <h2 className="my-4">Lista de Proveedores</h2>
       <ul className="list-group mb-4">
