@@ -4,7 +4,7 @@ import axios from 'axios';
 function App() {
   const [welcomeMessage, setWelcomeMessage] = useState('');
   const [version, setVersion] = useState('');
-  const [proveedores, setProveedores] = useState([]);  // Inicializar como un array vacío
+  const [proveedores, setProveedores] = useState([]);
   const [nombre, setNombre] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -14,8 +14,8 @@ function App() {
   const [limit] = useState(5);  // Número de proveedores por página
   const [total, setTotal] = useState(0);  // Total de proveedores
 
+  // Obtener el mensaje de bienvenida y la versión
   useEffect(() => {
-    // Obtener el mensaje de bienvenida
     axios.get('http://localhost:4000/welcome')
       .then(response => {
         setWelcomeMessage(response.data.message);
@@ -32,11 +32,11 @@ function App() {
   const obtenerProveedores = () => {
     axios.get(`http://localhost:4000/proveedores?page=${page}&limit=${limit}`)
       .then(response => {
-        setProveedores(response.data || []);  // Asegurarse de que sea un array
-        setTotal(response.data.total || 0);  // Asegurarse de que el total sea un número
+        setProveedores(response.data.proveedores || []);  // Asegurarse de que sea un array
+        setTotal(response.data.total || 0);  // Guardar el total de proveedores
       })
       .catch(error => {
-        setProveedores([]);  // En caso de error, establecer proveedores como array vacío
+        setProveedores([]);  // En caso de error, devolver un array vacío
         console.error('Error al obtener los proveedores:', error);
       });
   };
@@ -65,8 +65,8 @@ function App() {
       });
   };
 
-  const eliminarProveedor = (id) => {
-    axios.delete(`http://localhost:4000/proveedores/${id}`)
+  const eliminarProveedor = (nombre) => {
+    axios.delete(`http://localhost:4000/proveedores/${nombre}`)
       .then(response => {
         setSuccess('Proveedor eliminado correctamente');
         setError('');
@@ -79,7 +79,7 @@ function App() {
   };
 
   const siguientePagina = () => {
-    if (page * limit < total) {  // Si hay más proveedores por mostrar
+    if (page * limit < total) {
       setPage(page + 1);
     }
   };
@@ -101,7 +101,7 @@ function App() {
           proveedores.map((proveedor, index) => (
             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
               {proveedor.nombre} - {proveedor.razonSocial} - {proveedor.direccion}
-              <button className="btn btn-danger" onClick={() => eliminarProveedor(proveedor.id)}>Eliminar</button>
+              <button className="btn btn-danger" onClick={() => eliminarProveedor(proveedor.nombre)}>Eliminar</button>
             </li>
           ))
         ) : (

@@ -4,6 +4,7 @@ const bodyParser = require('koa-bodyparser');
 const fs = require('fs');
 const path = require('path');
 const cors = require('@koa/cors');  // Importar koa-cors
+const db = require('./bd');  // Importamos el Singleton de la base de datos
 
 const app = new Koa();
 const router = new Router();
@@ -35,45 +36,50 @@ router.get('/welcome', async (ctx) => {
   };
 });
 
-router.get('/proveedores', async (ctx) => {
-  const data = readDatabase();
-  ctx.body = data.providers;
+// Ruta para listar proveedores con paginación
+router.get('/proveedores', (ctx) => {
+  const { page = 1, limit = 5 } = ctx.query;
+  const data = db.getProveedores();  // Usamos el Singleton para obtener los proveedores
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const proveedoresPaginados = data.proveedores.slice(startIndex, endIndex);
+
+  ctx.body = {
+    proveedores: proveedoresPaginados,
+    total: data.proveedores.length,
+    page: parseInt(page),
+    limit: parseInt(limit)
+  };
 });
 
-router.post('/proveedores', async (ctx) => {
-  const { nombre, razonSocial, direccion } = ctx.request.body;
-  const data = readDatabase();
-  const exists = data.providers.find(provider => provider.nombre === nombre);
+router.post('/proveedores', (ctx) => {
+  const data = db.getProveedores();  // Usamos el Singleton para leer los proveedores
+  const nuevoProveedor = ctx.request.body;
 
-  if (exists) {
+  const existe = data.proveedores.some(p => p.nombre === nuevoProveedor.nombre);
+
+  if (existe) {
     ctx.status = 400;
-    ctx.body = { message: 'Proveedor ya existe' };
+    ctx.body = { error: 'El proveedor ya existe' };
   } else {
-    const newProvider = {
-      id: data.providers.length + 1,
-      nombre,
-      razonSocial,
-      direccion
-    };
-    data.providers.push(newProvider);
-    writeDatabase(data);
-    ctx.status = 201;
-    ctx.body = newProvider;
+    data.proveedores.push(nuevoProveedor);
+    db.saveProveedores(data.proveedores);  // Usamos el Singleton para guardar los proveedores
+    ctx.body = { message: 'Proveedor agregado', proveedor: nuevoProveedor };
   }
 });
 
-router.delete('/proveedores/:id', async (ctx) => {
-  const { id } = ctx.params;
-  let data = readDatabase();
-  const initialLength = data.providers.length;
-  data.providers = data.providers.filter(provider => provider.id !== parseInt(id));
+router.delete('/proveedores/:nombre', (ctx) => {
+  const data = db.getProveedores();  // Usamos el Singleton para leer los proveedores
+  const nombre = ctx.params.nombre;
 
-  if (data.providers.length === initialLength) {
+  const proveedorIndex = data.proveedores.findIndex(p => p.nombre === nombre);
+
+  if (proveedorIndex === -1) {
     ctx.status = 404;
-    ctx.body = { message: 'Proveedor no encontrado' };
+    ctx.body = { error: 'Proveedor no encontrado' };
   } else {
-    writeDatabase(data);
-    ctx.status = 200;
+    data.proveedores.splice(proveedorIndex, 1);
+    db.saveProveedores(data.proveedores);  // Usamos el Singleton para guardar los proveedores
     ctx.body = { message: 'Proveedor eliminado' };
   }
 });

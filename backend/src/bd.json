@@ -1,5 +1,5 @@
 {
-  "providers": [
+  "proveedores": [
     {
       "id": 1,
       "nombre": "Proveedor 1",
@@ -21,6 +21,16 @@
     {
       "id": 4,
       "nombre": "v",
+      "razonSocial": "b",
+      "direccion": "c"
+    },
+    {
+      "nombre": "dsds",
+      "razonSocial": "sdsds",
+      "direccion": "sdsds"
+    },
+    {
+      "nombre": "aff",
       "razonSocial": "b",
       "direccion": "c"
     }
